@@ -10,7 +10,7 @@
 
     - name: Slurp packages requiring reboot
       ansible.builtin.slurp:
-        src: /var/run/reboot-required.pkg
+        src: /var/run/reboot-required.pkgs
       register: _reboot_required_pkg
 
     - name: Print packages requiring reboot
