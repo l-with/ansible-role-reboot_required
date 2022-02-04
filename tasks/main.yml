@@ -1,0 +1,32 @@
+---
+
+- name: Check if reboot required
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: _reboot_required_stat
+
+- name: Reboot if required and wait for connection
+  block:
+
+    - name: Slurp packages requiring reboot
+      ansible.builtin.slurp:
+        src: /var/run/reboot-required.pkgs
+      register: _reboot_required_pkg
+
+    - name: Print packages requiring reboot
+      ansible.builtin.debug:
+        msg: "packages requiring reboot: {{ _reboot_required_pkg['content'] | b64decode }}"
+
+    - name: Reboot
+      ansible.builtin.reboot:
+
+    - name: Wait for connection
+      ansible.builtin.wait_for_connection:
+        connect_timeout: 120
+        delay:           10
+        sleep:           5
+        timeout:         300
+
+  when: _reboot_required_stat.stat.exists
+
+...
